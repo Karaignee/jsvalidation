@@ -1,91 +1,110 @@
 <%= form_for(@product) do |f| %>
-  <% if @product.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h2>
+    <% if @product.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@product.errors.count, "error") %> prohibited this product from being saved:</h2>
 
-      <ul>
-      <% @product.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
+          <ul>
+            <% @product.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+    <div id="error_msg">
+
     </div>
-  <% end %>
-  <div class="error_msg">
 
-  </div>
-
-  <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :price %><br />
-    <%= f.text_field :price %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+    <div class="field">
+      <%= f.label :name %>
+      <br/>
+      <%= f.text_field :name %>
+    </div>
+    <div class="field">
+      <%= f.label :price %>
+      <br/>
+      <%= f.text_field :price %>
+    </div>
+    <div class="actions">
+      <%= f.submit %>
+    </div>
 <% end %>
 <script>
-  var is_form_valid = function()  {
-      var display_error = function(input, msg){
-        $(input).parents(".field")
-      .addClass("field_with_errors");
+    var is_form_valid = function () {
+        var display_error = function (input, msg) {
+            $(input).parents(".field")
+                    .addClass("field_with_errors");
 
-       $("#error_msg").text(msg);
+            $("#error_msg").text(msg);
 
-      }
-    var is_name_valid = function()   {
-     var input = $("#product_name");
-     var value = $(input).val().trim();
-        $(input).val(value);            /*allows to update the value*/
+        }
+        var is_name_valid = function () {
+            var input = $("#product_name");
+            /*here we get the product name input, take it out trim it and put it back in. */
+            var value = $(input).val().trim();
+            $(input).val(value);
 
-        var regex = /^[A-Z][a-z]{3,50}$/;
-        var is_valid = value.match(regex);
+            var regex = /^[A-Za-z0-9 -]{3,50}$/;
+            var is_valid = regex.test(value);
 
-        if(is_valid) {return true; }
+            if (is_valid) {
+                return true;
+            }
 
-        display_error(input, "Name not valid");
-        return false;
-    }
-
-
-    var is_price_valid = function(){
-        var input = $("#product_price");
-        var value = $(input).val().trim();
-        $(input).val(value);
-
-        var value_float = parseFloat(value);
+            display_error(input, "Name not valid");
+            return false;
+        }
 
 
-        switch(true)
-        {case isNaN(value_float):
-        display_error(input, "Price is not a valid number");
-        return false;
-            case value_float < 0:
+        var is_price_valid = function () {
+            var input = $("#product_price");
+            var value = $(input).val().trim();
+            $(input).val(value);
+
+            /*parsing: in this instance we are taking a given value and parseFloat means read .val
+            (which is always a string) and turn it into a Float  and if you can't then it returns NaN by default*/
+            var value_float = parseFloat(value);
+
+            if (isNaN(value_float)) {
+                display_error(input, "Price is not a valid number");
+                return false;
+            } else if (value_float < 0) {
                 display_error(input, "Price must be positive");
                 return false;
+            }
+
+            return true;
+
+            /* switch(true)
+             {
+             case isNaN(value_float):
+             display_error(input, "Price is not a valid number");
+             return false;
+             case value_float < 0:
+             display_error(input, "Price must be positive");
+             return false;
+             }
+
+             return true;  this was the function given in class, replaced it with if else statement */
         }
-        /* Nan 'not a number' in javascript*/
-          return true;
+
+        $("#error_msg").text("");
+        $(".field_with_errors").removeClass("field_with_errors");
+
+
+        return is_name_valid() && is_price_valid();
+
     }
 
-      $("#error_msg").text("");
-     $(".field_with_errors").removeClass("field_with_errors");
-
-
-    return is_name_valid() && is_price_valid();
-
-  }
-
-  $("form").on("submit", function(e) {
-          e.preventDefault();
-      if(is_form_valid())      {
-      alert("save the info");
-  }else {
-      alert("fill in the form")  ;
-  }
-  });
+    $("form").on("submit", function (e) {
+        e.preventDefault();
+        /* e.prevent is a browser command rather than return false which is
+         handled by jquery its more of  a default function of the browser */
+        if (is_form_valid()) {
+            alert("save the info");
+        } else {
+            alert("fill in the form");
+        }
+    });
 </script>
 
 
